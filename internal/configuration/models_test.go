@@ -90,6 +90,9 @@ func TestGetConfiguration(t *testing.T) {
 	bytes, _ := json.MarshalIndent(confObject, "", "  ")
 
 	match := compare(configurationJson, string(bytes))
+	if !match {
+		t.Error("configurationJson should not match")
+	}
 
 	confObject, _ = GetConfiguration([]byte(badConfigurationJson))
 	bytes, _ = json.MarshalIndent(confObject, "", "  ")
