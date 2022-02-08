@@ -1,0 +1,39 @@
+{
+  "group_id": "cutty-sark",
+  "topics": [
+    {
+      "name": "Alarms",
+      "brokers": [
+        {
+          "url": "miner:9092"
+        },
+        {
+          "url": "miner:9093"
+        }
+      ]
+    },
+    {
+      "name": "Events",
+      "brokers": [
+        {
+          "url": "miner:9092"
+        },
+        {
+          "url": "miner:9093"
+        }
+      ]
+    },
+    {
+      "name": "Metrics",
+      "brokers": [
+        {
+          "url": "miner:9092"
+        },
+        {
+          "url": "miner:9093"
+        }
+      ]
+    }
+  ]
+}
+
