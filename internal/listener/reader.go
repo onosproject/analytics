@@ -3,8 +3,8 @@ package listener
 import (
 	"context"
 
-	"../../pkg/kafkaClient"
-	"../channels"
+	"github.com/onosproject/analytics/internal/channels"
+	"github.com/onosproject/analytics/pkg/kafkaClient"
 )
 
 func StartTopicReader(ctx context.Context, channelName string, brokerURLs []string, inbound string, groupID string) {
