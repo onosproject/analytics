@@ -1,23 +1,19 @@
 package processor
 
 import (
-	"context"
 	"encoding/json"
 	"log"
 	"time"
 
-	"../channels"
+	"github.com/onosproject/analytics/internal/channels"
+	"github.com/onosproject/analytics/pkg/kafkaClient"
 	"github.com/onosproject/analytics/pkg/messages"
-	"github.com/segmentio/kafka-go"
 )
 
 func StartEventProcessor(channelName string, kafkaURI []string, kafkaTopic string) {
 	input := channels.GetChannel(channelName)
-	producer := kafka.Writer{
-		Addr:     kafka.TCP(kafkaURI[0]),
-		Topic:    kafkaTopic,
-		Balancer: &kafka.LeastBytes{},
-	}
+	writer := kafkaClient.GetWriter(kafkaURI[0], kafkaTopic)
+
 	log.Printf("StartEventProcessor(%s,%s,%s)", channelName, kafkaURI[0], kafkaTopic)
 	for {
 		eventJSON := <-input
@@ -38,13 +34,7 @@ func StartEventProcessor(channelName string, kafkaURI []string, kafkaTopic strin
 			log.Printf("failed to marshal event %v", err)
 			break
 		}
-		msg := kafka.Message{Value: message}
-		err = producer.WriteMessages(context.Background(), msg)
-		if err != nil {
-			log.Printf("producer.WriteMessages threw %v ", err)
-		} else {
-			log.Printf("Wrote messages to %s successfully", kafkaTopic)
-		}
+		writer.SendMessage(message)
 	}
 
 }

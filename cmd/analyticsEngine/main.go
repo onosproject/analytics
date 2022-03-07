@@ -1,23 +1,18 @@
-/*
- * Copyright 2020-present Open Networking Foundation
- *
- * SPDX-License-Identifier: Apache-2.0
- *
- */
 package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"io/ioutil"
 	"log"
+	"strings"
 	"time"
-
-	//  "encoding/json"
 
 	"github.com/onosproject/analytics/internal/channels"
 	"github.com/onosproject/analytics/internal/configuration"
-	"github.com/onosproject/analytics/internal/kafkaConnector"
+	"github.com/onosproject/analytics/internal/listener"
+	"github.com/onosproject/analytics/internal/processor"
 )
 
 var Config configuration.Configuration
@@ -35,10 +30,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("Unable to load configuration %v", err)
 	}
+	js, _ := json.Marshal(Config)
+	log.Println(string(js))
 
 	log.Println(Config)
-	ctx := context.Background()
 	channels.Init()
+	ctx := context.Background()
 
 	topics := Config.Topics
 	for i := 0; i < len(topics); i++ {
@@ -46,8 +43,21 @@ func main() {
 		for j := 0; j < len(topics[i].Brokers); j++ {
 			var brokerURLs []string
 			brokerURLs = append(brokerURLs, topics[i].Brokers[j].URL)
-			go kafkaConnector.StartTopicReader(ctx, brokerURLs, topics[i].Name, Config.GroupID)
+			go listener.StartTopicReader(ctx, topics[i].Name, brokerURLs, topics[i].Queues.Inbound, Config.GroupID)
+			switch strings.ToUpper(topics[i].Name) {
+			case "ALARMS":
+				go processor.StartAlarmProcessor(topics[i].Name, brokerURLs, topics[i].Queues.Outbound)
+			case "EVENTS":
+				go processor.StartEventProcessor(topics[i].Name, brokerURLs, topics[i].Queues.Outbound)
+			case "METRICS":
+				go processor.StartMetricsProcessor(topics[i].Name, brokerURLs, topics[i].Queues.Outbound)
+			}
 		}
 	}
-	time.Sleep(time.Second * 60)
+	for {
+		time.Sleep(time.Second * 60)
+		log.Println("AnalyticEngine Stats")
+		channels.PrintChannelStats()
+	}
+
 }

@@ -1,22 +1,23 @@
 package processor
 
 import (
-	"context"
 	"encoding/json"
 	"log"
 	"time"
 
-	"../channels"
-	"github.com/segmentio/kafka-go"
+	"github.com/onosproject/analytics/internal/channels"
+	"github.com/onosproject/analytics/pkg/kafkaClient"
+	"github.com/onosproject/analytics/pkg/messages"
 )
 
 func StartAlarmProcessor(channelName string, kafkaURI []string, kafkaTopic string) {
 	input := channels.GetChannel(channelName)
-	writer := kafkaWriter.GetWriter(kafkaURI, kafkaTopic)
+
+	writer := kafkaClient.GetWriter(kafkaURI[0], kafkaTopic)
 	for {
 		alarmJSON := <-input
 		log.Printf("AlarmProcessor received %s", string(alarmJSON))
-		var alarm models.Alarm
+		var alarm messages.Alarm
 		if alarmJSON == "" {
 			continue
 		}
@@ -32,16 +33,10 @@ func StartAlarmProcessor(channelName string, kafkaURI []string, kafkaTopic strin
 			log.Printf("failed to marshal alarm %v", err)
 			break
 		}
-		msg := kafka.Message{Value: message}
-		err = producer.WriteMessages(context.Background(), msg)
-		if err != nil {
-			log.Printf("producer.WriteMessages threw %v ", err)
-		} else {
-			log.Printf("Wrote messages to %s successfully", kafkaTopic)
-		}
+		writer.SendMessage(message)
 	}
 
 }
-func enrichAlarm(alarm *models.Alarm) {
+func enrichAlarm(alarm *messages.Alarm) {
 	alarm.Timestamp = time.Now()
 }

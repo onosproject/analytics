@@ -1,9 +1,3 @@
-/*
- * Copyright 2020-present Open Networking Foundation
- *
- * SPDX-License-Identifier: Apache-2.0
- *
- */
 package configuration
 
 import (
@@ -11,6 +5,10 @@ import (
 	"log"
 )
 
+type Queue struct {
+	Inbound  string `json:"inbound"`
+	Outbound string `json:"outbound"`
+}
 type Broker struct {
 	URL string `json:"url"`
 }
@@ -18,6 +16,7 @@ type Broker struct {
 type Topic struct {
 	Name    string   `json:"name"`
 	Brokers []Broker `json:"brokers"`
+	Queues  Queue    `json:"queues"`
 }
 
 type Configuration struct {
