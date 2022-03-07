@@ -1,4 +1,4 @@
-module github.com/onosproject/analytics/pkg/messages/kafkaClient
+module github.com/onosproject/analytics/pkg/kafkaClient
 
 go 1.17
 
