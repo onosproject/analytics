@@ -25,6 +25,11 @@ type Configuration struct {
 	Topics  []Topic `json:"topics"`
 }
 
+/*
+GetConfiguration
+converts byte array from config file into a configuration
+struct
+*/
 func GetConfiguration(config []byte) (Configuration, error) {
 	var conf Configuration
 	err := json.Unmarshal(config, &conf)

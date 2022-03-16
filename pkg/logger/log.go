@@ -31,6 +31,18 @@ func Init(logFile string, logLevel LogLevel) {
 	}
 }
 
+/*
+Logging Functions Warn/Info/Debug will always print if called
+
+To filter based on log level set they should be wrapped in the
+appropriate If function below.
+i.e.
+if logger.IfDeug(){
+	logger.Debug("message")
+}
+This prevents needless string contruction for level that
+shouldn't be logged
+*/
 func Error(message string, args ...interface{}) {
 	newMessage := fmt.Sprintf(message, args...)
 	log.Println("ERROR:", newMessage)

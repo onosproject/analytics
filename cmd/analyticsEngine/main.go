@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/onosproject/analytics/internal/channels"
 	"github.com/onosproject/analytics/internal/configuration"
 	"github.com/onosproject/analytics/internal/listener"
 	"github.com/onosproject/analytics/pkg/logger"
@@ -54,7 +53,6 @@ func main() {
 
 		logger.Debug("Configuration: %v", Config)
 	}
-	channels.Init()
 	ctx := context.Background()
 
 	topics := Config.Topics
@@ -75,6 +73,6 @@ func main() {
 		if logger.IfDebug() {
 			logger.Debug("AnalyticsEngine waking up")
 		}
-		channels.PrintChannelStats()
+		//TODO print stats etc
 	}
 }

@@ -22,6 +22,7 @@ func processAlarm(alarmJSON string) ([]byte, error) {
 	return message, err
 }
 
+//Place holder
 func enrichAlarm(alarm *messages.Alarm) {
 	alarm.Timestamp = time.Now()
 }
