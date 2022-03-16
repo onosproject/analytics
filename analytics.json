@@ -1,5 +1,6 @@
 {
   "group_id": "analytics",
+
   "topics": [
     {
       "name": "Alarms",
@@ -24,6 +25,7 @@
         "inbound": "events",
         "outbound": "druidEvents"
       }
+
     },
     {
       "name": "Metrics",

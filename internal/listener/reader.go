@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/onosproject/analytics/internal/processor"
-
 	"github.com/onosproject/analytics/pkg/kafkaClient"
 	"github.com/onosproject/analytics/pkg/logger"
 )

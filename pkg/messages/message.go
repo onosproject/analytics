@@ -94,6 +94,5 @@ func GetJson(message Message) ([]byte, error) {
 	if logger.IfDebug() {
 		logger.Debug("%v.GetJson() returning %s\n", message, string(bytes))
 	}
-
 	return bytes, nil
 }
