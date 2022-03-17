@@ -23,7 +23,11 @@ var configurationJson = `{
         {
           "url": "miner:9093"
         }
-      ]
+      ],
+      "queues": {
+        "inbound": "",
+        "outbound": ""
+      }
     },
     {
       "name": "Events",
@@ -34,7 +38,11 @@ var configurationJson = `{
         {
           "url": "miner:9093"
         }
-      ]
+      ],
+      "queues": {
+        "inbound": "",
+        "outbound": ""
+      }
     },
     {
       "name": "Metrics",
@@ -45,7 +53,11 @@ var configurationJson = `{
         {
           "url": "miner:9093"
         }
-      ]
+      ],
+      "queues": {
+        "inbound": "",
+        "outbound": ""
+      }
     }
   ]
 }`

@@ -8,8 +8,14 @@ package configuration
 
 import (
 	"encoding/json"
-	"log"
+
+	"github.com/onosproject/analytics/pkg/logger"
 )
+
+type Queue struct {
+	Inbound  string `json:"inbound"`
+	Outbound string `json:"outbound"`
+}
 
 type Broker struct {
 	URL string `json:"url"`
@@ -18,6 +24,7 @@ type Broker struct {
 type Topic struct {
 	Name    string   `json:"name"`
 	Brokers []Broker `json:"brokers"`
+	Queues  Queue    `json:"queues"`
 }
 
 type Configuration struct {
@@ -25,12 +32,20 @@ type Configuration struct {
 	Topics  []Topic `json:"topics"`
 }
 
+/*
+GetConfiguration
+converts byte array from config file into a configuration
+struct
+*/
 func GetConfiguration(config []byte) (Configuration, error) {
 	var conf Configuration
 	err := json.Unmarshal(config, &conf)
 	if err != nil {
-		log.Printf("Unable to unmarshal config file  %v", err)
+		logger.Error("Unable to unmarshal config file  %v", err)
 		return conf, err
+	}
+	if logger.IfDebug() {
+		logger.Debug("Created Configuration Object %v", conf)
 	}
 	return conf, nil
 }

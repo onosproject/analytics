@@ -1,39 +1,43 @@
 {
-  "group_id": "cutty-sark",
+  "group_id": "analytics",
+
   "topics": [
     {
       "name": "Alarms",
       "brokers": [
         {
-          "url": "miner:9092"
-        },
-        {
-          "url": "miner:9093"
+          "url": "work-server:9092"
         }
-      ]
+      ],
+      "queues": {
+        "inbound": "alarms",
+        "outbound": "druidAlarms"
+      }
     },
     {
       "name": "Events",
       "brokers": [
         {
-          "url": "miner:9092"
-        },
-        {
-          "url": "miner:9093"
+          "url": "work-server:9092"
         }
-      ]
+      ],
+      "queues": {
+        "inbound": "events",
+        "outbound": "druidEvents"
+      }
+
     },
     {
       "name": "Metrics",
       "brokers": [
         {
-          "url": "miner:9092"
-        },
-        {
-          "url": "miner:9093"
+          "url": "work-server:9092"
         }
-      ]
+      ],
+      "queues": {
+        "inbound": "metrics",
+        "outbound": "druidMetrics"
+      }
     }
   ]
 }
-
