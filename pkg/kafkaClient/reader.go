@@ -24,13 +24,19 @@ func StartTopicReader(ctx context.Context, messageChannel chan string, errorChan
 	// initialize a new reader with the brokers and topic
 	// the groupID identifies the consumer and prevents
 	// it from receiving duplicate messages
-
+	r := kafka.NewReader(kafka.ReaderConfig{
+		Brokers: brokerURLs,
+		Topic:   inbound,
+		GroupID: groupID,
+	})
 
 	brokerStr := "Brokers: "
 	for i := 0; i < len(brokerURLs); i++ {
 		brokerStr += brokerURLs[i]
 	}
-	log.Printf("StartTopicReader(%s,%s,%s)", brokerStr, inbound, groupID)
+	if logger.IfInfo() {
+		logger.Info("StartTopicReader(%s,%s,%s)", brokerStr, inbound, groupID)
+	}
 	for {
 		// the `ReadMessage` function blocks until we receive the next event
 		msg, err := r.ReadMessage(ctx)
