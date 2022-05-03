@@ -10,12 +10,13 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
-	"github.com/onosproject/analytics/internal/configuration"
-	"github.com/onosproject/analytics/internal/listener"
-	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"io/ioutil"
 	"strings"
 	"time"
+
+	"github.com/onosproject/analytics/internal/configuration"
+	"github.com/onosproject/analytics/internal/listener"
+	"github.com/onosproject/onos-lib-go/pkg/logging"
 )
 
 var Config configuration.Configuration
