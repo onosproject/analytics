@@ -3,7 +3,7 @@ package messages
 import (
 	"encoding/json"
 
-	"github.com/onosproject/analytics/pkg/logger"
+	"github.com/onosproject/onos-lib-go/pkg/logging"
 )
 
 type MessageType int
@@ -13,6 +13,8 @@ const (
 	EVENT
 	METRIC
 )
+
+var log = logging.GetLogger("messages")
 
 /*
 Message interface enables single functions to be used to
@@ -40,16 +42,14 @@ GetModel
 takes Json and unmarshals into appropriate message model
 */
 func GetModel(messageType MessageType, msgJson []byte) (Message, error) {
-	if logger.IfDebug() {
-		logger.Debug("GetModel(%s, %s)",
-			getMessageTypeName(messageType), string(msgJson))
-	}
+	log.Debugf("GetModel(%s, %s)",
+		getMessageTypeName(messageType), string(msgJson))
 	switch messageType {
 	case ALARM:
 		var alarm Alarm
 		err := json.Unmarshal(msgJson, &alarm)
 		if err != nil {
-			logger.Error("Failed to Unmarshal %s, err:%v",
+			log.Errorf("Failed to Unmarshal %s, err:%v",
 				string(msgJson), err)
 			return nil, err
 		}
@@ -58,7 +58,7 @@ func GetModel(messageType MessageType, msgJson []byte) (Message, error) {
 		var event Event
 		err := json.Unmarshal(msgJson, &event)
 		if err != nil {
-			logger.Error("Failed to Unmarshal %s, err:%v",
+			log.Errorf("Failed to Unmarshal %s, err:%v",
 				string(msgJson), err)
 			return nil, err
 		}
@@ -67,7 +67,7 @@ func GetModel(messageType MessageType, msgJson []byte) (Message, error) {
 		var metric Metric
 		err := json.Unmarshal(msgJson, &metric)
 		if err != nil {
-			logger.Error("Failed to Unmarshal %s, err:%v",
+			log.Errorf("Failed to Unmarshal %s, err:%v",
 				string(msgJson), err)
 			return nil, err
 		}
@@ -83,16 +83,12 @@ converts message struct (event/alarm/metric) into json
 byte array suitable for sending to kafka bus
 */
 func GetJson(message Message) ([]byte, error) {
-	if logger.IfDebug() {
-		logger.Debug("GetJson(%v)\n", message)
-	}
+	log.Debugf("GetJson(%v)\n", message)
 	bytes, err := json.Marshal(message)
 	if err != nil {
-		logger.Error("json.Marshal for %v failed error: %v\n", message, err)
+		log.Errorf("json.Marshal for %v failed error: %v\n", message, err)
 		return []byte{}, err
 	}
-	if logger.IfDebug() {
-		logger.Debug("%v.GetJson() returning %s\n", message, string(bytes))
-	}
+	log.Debugf("%v.GetJson() returning %s\n", message, string(bytes))
 	return bytes, nil
 }

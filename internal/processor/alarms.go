@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/onosproject/analytics/pkg/logger"
 	"github.com/onosproject/analytics/pkg/messages"
 )
 
@@ -15,9 +14,7 @@ func processAlarm(alarmJSON string) ([]byte, error) {
 		return []byte{}, err
 	}
 	enrichAlarm(&alarm)
-	if logger.IfDebug() {
-		logger.Debug("Alarm after enrich: %v", alarm)
-	}
+	log.Debugf("Alarm after enrich: %v", alarm)
 	message, err := json.Marshal(alarm)
 	return message, err
 }

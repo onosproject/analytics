@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/onosproject/analytics/pkg/kafkaClient"
-	"github.com/onosproject/analytics/pkg/logger"
+	"github.com/onosproject/onos-lib-go/pkg/logging"
 )
 
 type ProcessorType uint
@@ -15,64 +15,64 @@ const (
 	METRIC
 )
 
+var log = logging.GetLogger("message_processor")
+
 func StartProcessor(channelName string, messageChan chan string, errorChan chan error, kafkaURI []string, kafkaTopic string) {
 
 	writer := kafkaClient.GetWriter(kafkaURI[0], kafkaTopic)
 	var myType ProcessorType
-	logger.Debug(strings.ToUpper(channelName))
+	log.Debug(strings.ToUpper(channelName))
 	switch strings.ToUpper(channelName) {
 	case "METRICS":
-		logger.Debug("metric")
+		log.Debug("metric")
 		myType = METRIC
 	case "EVENTS":
-		logger.Debug("event")
+		log.Debug("event")
 		myType = EVENT
 	case "ALARMS":
-		logger.Debug("alarm")
+		log.Debug("alarm")
 		myType = ALARM
 
 	}
 
-	logger.Debug("StartProcessor(%s,%v,%s) type: %d", channelName, kafkaURI, kafkaTopic, myType)
+	log.Debugf("StartProcessor(%s,%v,%s) type: %d", channelName, kafkaURI, kafkaTopic, myType)
 
 	for {
 		select {
 		case err := <-errorChan:
-			logger.Error("kafkaClient read error: %v", err)
+			log.Errorf("kafkaClient read error: %v", err)
 		case messageJSON := <-messageChan:
-			if logger.IfDebug() {
-				logger.Debug("MessageProcessor received %s", messageJSON)
-			}
+			log.Debugf("MessageProcessor received %s", messageJSON)
 			switch myType {
 			case ALARM:
 				message, err := processAlarm(messageJSON)
 				if err != nil {
-					logger.Error("Failed to process Alarm: %s err:%v", messageJSON, err)
+					log.Errorf("Failed to process Alarm: %s err:%v", messageJSON, err)
 				}
 
 				err = writer.SendMessage(message)
 				if err != nil {
-					logger.Error("Failed to send message: %s", message)
+					log.Errorf("Failed to send message: %s", message)
 				}
 			case EVENT:
 				message, err := processEvent(messageJSON)
 				if err != nil {
-					logger.Error("Failed to process Event: %s err:%v", messageJSON, err)
+					log.Errorf("Failed to process Event: %s err:%v", messageJSON, err)
 				}
 
 				err = writer.SendMessage(message)
 				if err != nil {
-					logger.Error("Failed to send message: %s", message)
+					log.Errorf("Failed to send message: %s", message)
 				}
 			case METRIC:
 				message, err := processMetric(messageJSON)
 				if err != nil {
-					logger.Error("Failed to process Metric: %s err:%v", messageJSON, err)
+					log.Errorf("Failed to process Metric: %s err:%v", messageJSON, err)
 				}
 
 				err = writer.SendMessage(message)
 				if err != nil {
-					logger.Error("Failed to send message: %s", message)
+					log.Errorf("Failed to send message: %s", message)
 				}
 			}
 		}

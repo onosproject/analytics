@@ -5,8 +5,10 @@ import (
 
 	"github.com/onosproject/analytics/internal/processor"
 	"github.com/onosproject/analytics/pkg/kafkaClient"
-	"github.com/onosproject/analytics/pkg/logger"
+	"github.com/onosproject/onos-lib-go/pkg/logging"
 )
+
+var log = logging.GetLogger("listener")
 
 /*
 StartTopicReader
@@ -14,10 +16,8 @@ creates needed channels and wires together the kafkaClient and processor
 */
 func StartTopicReader(ctx context.Context, channelName string, brokerURLs []string,
 	inbound string, outbound string, groupID string) {
-	if logger.IfInfo() {
-		logger.Info("Calling processor.StartProcessor(%s,%v,%s)",
-			channelName, brokerURLs, outbound)
-	}
+	log.Infof("Calling processor.StartProcessor(%s,%v,%s)",
+		channelName, brokerURLs, outbound)
 
 	// initialize a new reader with the brokers and topic
 	// the groupID identifies the consumer and prevents

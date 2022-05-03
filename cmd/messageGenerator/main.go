@@ -2,8 +2,7 @@ package main
 
 import (
 	"flag"
-	"log"
-	"os"
+	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"strconv"
 	"time"
 
@@ -16,6 +15,8 @@ var alarmsSent = 0
 var eventsSent = 0
 var refCount = 0
 
+var log = logging.GetLogger("message_generator")
+
 func main() {
 	//var configFile = flag.String("conf", "generator.json", "json config file for generator")
 	var kafkaURI = flag.String("uri", "localhost:9092", "uri of the kafka bus")
@@ -26,21 +27,11 @@ func main() {
 	var allMetrics = flag.Bool("all", false, "generate all message type")
 	var debug = flag.Bool("debug", false, "log debug messages")
 	var interval = flag.Int("interval", 10, "number of seconds to sleep between each message type")
-	var logFile = flag.String("logFile", "", "file to log to")
+
 	flag.Parse()
-	if *logFile != "" {
 
-		file, err := os.OpenFile(*logFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-		if err != nil {
-			log.Printf("Unable to open %s for writing", *logFile)
-			log.Printf("Will print log messages to stdout")
-		} else {
-			log.SetOutput(file)
-		}
-
-	}
-
-	log.Println("MessageGenerator")
+	log.SetLevel(logging.DebugLevel)
+	log.Debug("MessageGenerator")
 
 	if *allMetrics || *genAlarm {
 		refCount++
@@ -57,7 +48,7 @@ func main() {
 
 	statDuration := time.Duration(*interval*2) * time.Second
 	for {
-		log.Printf("Message Generator stats: Events Sent: %d, Alarms Sent: %d, Metrics Sent: %d\n", eventsSent, alarmsSent, metricsSent)
+		log.Debugf("Message Generator stats: Events Sent: %d, Alarms Sent: %d, Metrics Sent: %d\n", eventsSent, alarmsSent, metricsSent)
 		if refCount == 0 {
 			return
 		}
@@ -78,7 +69,7 @@ func generateAlarms(kafkaURI string, topic string, count int, interval int, debu
 		alarmsSent++
 
 		if debug {
-			log.Printf("Send Alarm %s\n", string(bytes))
+			log.Debugf("Send Alarm %s\n", string(bytes))
 		}
 		time.Sleep(sleepTime)
 		if count < 1 {
@@ -105,7 +96,7 @@ func generateMetrics(kafkaURI string, topic string, count int, interval int, deb
 		bytes, _ := messages.GetJson(metric)
 		metricWriter.SendMessage(bytes)
 		if debug {
-			log.Printf("Send Metric %s\n", string(bytes))
+			log.Debugf("Send Metric %s\n", string(bytes))
 		}
 		metricsSent++
 		time.Sleep(sleepTime)
@@ -128,7 +119,7 @@ func generateEvents(kafkaURI string, topic string, count int, interval int, debu
 		bytes, _ := messages.GetJson(event)
 		eventWriter.SendMessage(bytes)
 		if debug {
-			log.Printf("Send Event %s\n", string(bytes))
+			log.Debugf("Send Event %s\n", string(bytes))
 		}
 		eventsSent++
 		time.Sleep(sleepTime)
