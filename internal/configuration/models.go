@@ -9,7 +9,7 @@ package configuration
 import (
 	"encoding/json"
 
-	"github.com/onosproject/analytics/pkg/logger"
+	"github.com/onosproject/onos-lib-go/pkg/logging"
 )
 
 type Queue struct {
@@ -32,6 +32,8 @@ type Configuration struct {
 	Topics  []Topic `json:"topics"`
 }
 
+var log = logging.GetLogger("configuration")
+
 /*
 GetConfiguration
 converts byte array from config file into a configuration
@@ -41,11 +43,9 @@ func GetConfiguration(config []byte) (Configuration, error) {
 	var conf Configuration
 	err := json.Unmarshal(config, &conf)
 	if err != nil {
-		logger.Error("Unable to unmarshal config file  %v", err)
+		log.Errorf("Unable to unmarshal config file  %v", err)
 		return conf, err
 	}
-	if logger.IfDebug() {
-		logger.Debug("Created Configuration Object %v", conf)
-	}
+	log.Debugf("Created Configuration Object %v", conf)
 	return conf, nil
 }

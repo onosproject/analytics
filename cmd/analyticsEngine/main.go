@@ -10,55 +10,50 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
+	"github.com/onosproject/analytics/internal/configuration"
+	"github.com/onosproject/analytics/internal/listener"
+	"github.com/onosproject/onos-lib-go/pkg/logging"
 	"io/ioutil"
 	"strings"
 	"time"
-
-	"github.com/onosproject/analytics/internal/configuration"
-	"github.com/onosproject/analytics/internal/listener"
-	"github.com/onosproject/analytics/pkg/logger"
 )
 
 var Config configuration.Configuration
 
 func main() {
 	var configFile = flag.String("conf", "analytics.json", "json file containing configuration")
-	var logFile = flag.String("logFile", "AnalyticEngine.log", "file name to log to")
 	var logLevel = flag.String("logLevel", "error", "log level {error,warn,info,debug}")
 	flag.Parse()
-	var level logger.LogLevel
+	var level logging.Level
 	switch strings.ToUpper(*logLevel) {
 	case "DEBUG":
-		level = logger.DEBUG
+		level = logging.DebugLevel
 	case "INFO":
-		level = logger.INFO
+		level = logging.InfoLevel
 	case "WARN":
-		level = logger.WARN
+		level = logging.WarnLevel
 	case "ERROR":
-		level = logger.ERROR
+		level = logging.ErrorLevel
 	default:
-		level = logger.ERROR
+		level = logging.ErrorLevel
 	}
+	log := logging.GetLogger("analytics")
+	log.SetLevel(level)
 
-	logger.Init(*logFile, level)
-	if logger.IfInfo() {
-		logger.Info("AnalyticsEngine Config: %s", *configFile)
-	}
+	log.Infof("AnalyticsEngine Config: %s", *configFile)
 
 	content, err := ioutil.ReadFile(*configFile)
 	if err != nil {
-		logger.Fatal("Unable to load configuration file %v", err)
+		log.Fatalf("Unable to load configuration file %v", err)
 	}
 	Config, err := configuration.GetConfiguration(content)
 	if err != nil {
-		logger.Fatal("Unable to load configuration %v", err)
+		log.Fatalf("Unable to load configuration %v", err)
 	}
-	if logger.IfDebug() {
-		js, _ := json.Marshal(Config)
-		logger.Debug(string(js))
+	js, _ := json.Marshal(Config)
+	log.Debug(string(js))
 
-		logger.Debug("Configuration: %v", Config)
-	}
+	log.Debugf("Configuration: %v", Config)
 	ctx := context.Background()
 
 	topics := Config.Topics
@@ -66,19 +61,14 @@ func main() {
 		for j := 0; j < len(topics[i].Brokers); j++ {
 			var brokerURLs []string
 			brokerURLs = append(brokerURLs, topics[i].Brokers[j].URL)
-			if logger.IfInfo() {
-				logger.Info("calling listener.StartTopicReader(%v,%s,%v,%s,%s)",
-					ctx, topics[i].Name, brokerURLs, topics[i].Queues.Inbound, Config.GroupID)
-
-			}
+			log.Infof("calling listener.StartTopicReader(%v,%s,%v,%s,%s)",
+				ctx, topics[i].Name, brokerURLs, topics[i].Queues.Inbound, Config.GroupID)
 			go listener.StartTopicReader(ctx, topics[i].Name, brokerURLs, topics[i].Queues.Inbound, topics[i].Queues.Outbound, Config.GroupID)
 		}
 	}
 	for {
 		time.Sleep(time.Second * 60)
-		if logger.IfDebug() {
-			logger.Debug("AnalyticsEngine waking up")
-		}
+		log.Debug("AnalyticsEngine waking up")
 		//TODO print stats etc
 	}
 }

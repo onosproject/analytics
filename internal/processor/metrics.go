@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/onosproject/analytics/pkg/logger"
 	"github.com/onosproject/analytics/pkg/messages"
 )
 
@@ -15,9 +14,7 @@ func processMetric(metricJSON string) ([]byte, error) {
 		return []byte{}, err
 	}
 	enrichMetric(&metric)
-	if logger.IfDebug() {
-		logger.Debug("Metric after enrich: %v", metric)
-	}
+	log.Debugf("Metric after enrich: %v", metric)
 	message, err := json.Marshal(metric)
 	return message, err
 }
