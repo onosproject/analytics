@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/onosproject/analytics/pkg/logger"
 	"github.com/onosproject/analytics/pkg/messages"
 )
 
@@ -15,9 +14,7 @@ func processEvent(eventJSON string) ([]byte, error) {
 		return []byte{}, err
 	}
 	enrichEvent(&event)
-	if logger.IfDebug() {
-		logger.Debug("Event after enrich: %v", event)
-	}
+	log.Debugf("Event after enrich: %v", event)
 	message, err := json.Marshal(event)
 	return message, err
 }
